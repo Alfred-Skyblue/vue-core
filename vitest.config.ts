@@ -23,7 +23,6 @@ export default defineConfig({
   test: {
     globals: true,
     // disable threads on GH actions to speed it up
-    threads: !process.env.GITHUB_ACTIONS,
     setupFiles: 'scripts/setupVitest.ts',
     environmentMatchGlobs: [
       ['packages/{vue,vue-compat,runtime-dom}/**', 'jsdom']
@@ -33,7 +32,6 @@ export default defineConfig({
     },
     coverage: {
       provider: 'istanbul',
-      reporter: ['text', 'html'],
       exclude: [
         ...configDefaults.coverage.exclude!,
         // DOM transitions are tested via e2e so no coverage is collected
