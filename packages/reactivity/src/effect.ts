@@ -72,12 +72,12 @@ export class ReactiveEffect<T = any> {
    * Whether to pause
    * @internal
    */
-  private isPaused = false
+  private _isPaused = false
   /**
    * Indicates whether the run method was called during the pause process
    * @internal
    */
-  private isCalled = false
+  private _isCalled = false
 
   onStop?: () => void
   // dev only
@@ -94,20 +94,20 @@ export class ReactiveEffect<T = any> {
   }
 
   pause() {
-    this.isPaused = true
+    this._isPaused = true
   }
 
   resume(runOnResume = false) {
-    this.isPaused = false
-    if (runOnResume && this.isCalled) {
+    this._isPaused = false
+    if (runOnResume && this._isCalled) {
       this.run()
     }
-    this.isCalled = false
+    this._isCalled = false
   }
 
   run() {
-    if (this.isPaused) {
-      this.isCalled = true
+    if (this._isPaused) {
+      this._isCalled = true
       return
     }
     if (!this.active) {
