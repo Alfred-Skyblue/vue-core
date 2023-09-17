@@ -1,4 +1,4 @@
-import { ObjectDirective } from '@vue/runtime-core'
+import { ComponentInternalInstance, ObjectDirective } from '@vue/runtime-core'
 
 export const vShowOldKey = Symbol('_vod')
 
@@ -16,34 +16,48 @@ export const vShow: ObjectDirective<VShowElement> = {
       setDisplay(el, value)
     }
   },
-  mounted(el, { value }, { transition }) {
+  mounted(el, { value, component }, { transition }) {
     if (transition && value) {
       transition.enter(el)
     }
+    if (!value && component) {
+      component.effect.pause()
+    }
   },
-  updated(el, { value, oldValue }, { transition }) {
+  updated(el, { value, oldValue, component }, { transition }) {
     if (!value === !oldValue) return
     if (transition) {
       if (value) {
         transition.beforeEnter(el)
-        setDisplay(el, true)
+        setDisplay(el, true, component)
         transition.enter(el)
       } else {
         transition.leave(el, () => {
-          setDisplay(el, false)
+          setDisplay(el, false, component)
         })
       }
     } else {
-      setDisplay(el, value)
+      setDisplay(el, value, component)
     }
   },
-  beforeUnmount(el, { value }) {
-    setDisplay(el, value)
+  beforeUnmount(el, { value, component }) {
+    setDisplay(el, value, component)
   }
 }
 
-function setDisplay(el: VShowElement, value: unknown): void {
+function setDisplay(
+  el: VShowElement,
+  value: unknown,
+  component: ComponentInternalInstance | null = null
+): void {
   el.style.display = value ? el[vShowOldKey] : 'none'
+  if (component) {
+    if (!value) {
+      component.effect.pause()
+    } else {
+      component.effect.resume(true)
+    }
+  }
 }
 
 // SSR vnode transforms, only used when user includes client-oriented render

@@ -29,6 +29,7 @@ export interface DirectiveBinding<V = any> {
   arg?: string
   modifiers: DirectiveModifiers
   dir: ObjectDirective<any, V>
+  readonly component?: ComponentInternalInstance | null
 }
 
 export type DirectiveHook<T = any, Prev = VNode<any, T> | null, V = any> = (
@@ -111,7 +112,10 @@ export function withDirectives<T extends VNode>(
         value,
         oldValue: void 0,
         arg,
-        modifiers
+        modifiers,
+        get component() {
+          return vnode.component
+        }
       })
     }
   }
